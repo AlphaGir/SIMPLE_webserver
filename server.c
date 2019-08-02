@@ -1,4 +1,5 @@
 #include<stdio.h>
+#include<time.h>
 #include<unistd.h>
 #include<netdb.h>
 #include<sys/socket.h>
@@ -20,6 +21,7 @@ int main()
 	char buff[4096];
 	char sendmsg[4096]
 	int n;
+	long timeval;
 	if((socke =socket(AF_INET,SOCK_STREAM,0))==-1)
 		perror("socket:");
 
@@ -45,8 +47,11 @@ int main()
 		{
 		printf("%s\n",buff);
 		n=strlen(buff);
+                 char *cp;
+                cp=ctime(&timeval);
 		if(buff[0]!='G'&&buff[1]!='E'&&buff[2]!='T')
-                sprintf(sendmsg,http_header,400,"bad request",
+                sprintf(sendmsg,http_header,400,"bad request",cp);
+		send(fd,sendmsg,strlen(sendmsg),0);
 		}
 
 		//分割http请求消息．如果方法不是GET 403 看不懂你在说什么
