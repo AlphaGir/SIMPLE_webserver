@@ -12,15 +12,14 @@
 /*1.建立连接　
  *2.创建http返回请求
  *3.如果没有该文件就返回４０４，有就显示．
+ * 字符串拼接有毒 日了狗。。。。
  */
+char *http1 = "HTTP/1.1 200 OK\r\nContent-Type:text/html\r\nContent-Length: 11\r\nServer: mengkang\r\n\r\nhello world";
 char *http_header = "HTTP/1.1 %d %s\r\n"
-                    "Allow:GET \r\n"
                     "Content-Length: %d\r\n"
-                    "Content-Type: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n"
-                    "Content-Language: utf-8,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2\r\n"
-                    "Content-Encoding: DEFLATE,gzip,deflate,ZLIB,GZIP\r\n"
-                    "Date:%s \r\n"
-                    "\r\n"                   
+                    "Content-Type: text/html\r\n"
+                    "\r\n"
+                    "%s"                   
 ;
 
 void sig_child(int signo)
@@ -52,46 +51,53 @@ int main()
                    perror("bind:");
                    exit(1);
                 }
-	if(listen(socke,1)==-1)
+	if(listen(socke,10)==-1)
 		perror("no link:");
         signal(SIGCHLD,sig_child);
 	printf("------------wait for client -----------\n");
         int pid;
-        pid=fork();
 	while(1)
 	{
 		if((fd=accept(socke,(struct sockaddr*)NULL,NULL))==-1)
 		{
 			perror("accept:")	;	exit(1);
 		}
-                if(pid==0)
+                if((pid=fork())==0)
                 {
-                printf("there is someone!!!\n");
+ //               printf("there is someone!!!\n");
 		n=recv(fd,buff,MAXLINE,0);
-                close(socke);
+               close(socke);
 		printf("%s\n",buff);
 		n=strlen(buff);
-                char *msg;char *cp;
+                char msg[30];char *cp;
                 cp=ctime(&timeval);
 		if(buff[0]!='G'&&buff[1]!='E'&&buff[2]!='T')
                 {
-                sprintf(sendmsg,http_header,400,"bad request",n,cp);
-                strcpy("<h1> 404 NOT FOUND </h1>",msg);
+                sprintf(sendmsg,http_header,400,"bad request",n,cp,"not found");
+ //               printf("sendmsg:%s\n",sendmsg);
+               // strcpy(msg,"<h1> 404 NOT FOUND </h1>");
+   //             printf("msg:%s\n",msg);
                 }
                 else
                 {
-                   char *success="<h1>HELLO WORLD</h1>";
-                   sprintf(sendmsg,http_header,200,"OK",n,cp);
-                   strcpy(success,msg);
+                   char *success="HELLO WORLD";
+                   sprintf(sendmsg,http_header,200,"OK",11,success);
+                  //strcat(sendmsg,success);
+                   //strcpy(msg,success);
 		}
-                send(fd,sendmsg,strlen(sendmsg),0);
-                
-                send(fd,msg,strlen(msg),0);
-                printf("msg:%s\n",msg);
-                close(fd);
-                exit(0);
+               // send(fd,http1,strlen(http1),0);
+               //msg="<h1> HHHHHHHH</h1>";
+               send(fd,sendmsg,strlen(sendmsg),0);
+                //printf("msg:%s\n",msg);
+ //               sleep(100);
+                close(fd);exit(0);
                 }
-                close(fd);}
+                close(fd);
+              //  exit(0);
+           //     }
+             }
+                //close(socke);}
+                }
 
                 
           
@@ -103,4 +109,4 @@ int main()
            
 
 
-}
+//}
