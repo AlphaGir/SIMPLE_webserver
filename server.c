@@ -1,4 +1,5 @@
 #include<stdio.h>
+#include<fcntl.h>
 #include<stdlib.h>
 #include<time.h>
 #include<unistd.h>
@@ -8,11 +9,11 @@
 #include<sys/socket.h>
 #include<sys/wait.h>
 #include<signal.h>
+#include"IO.h"
 #define MAXLINE 4096
 /*1.建立连接　
  *2.创建http返回请求
  *3.如果没有该文件就返回４０４，有就显示．
- * 字符串拼接有毒 日了狗。。。。
  */
 char *http1 = "HTTP/1.1 200 OK\r\nContent-Type:text/html\r\nContent-Length: 11\r\nServer: mengkang\r\n\r\nhello world";
 char *http_header = "HTTP/1.1 %d %s\r\n"
@@ -27,8 +28,19 @@ void sig_child(int signo)
    int pid;
    int state;
    while((pid=waitpid(-1,(int *)0,WNOHANG))>0)
-   {printf("%d,child is dead",pid);}
+   printf("%d,child is dead",pid);
    return ;
+}
+void doit(char* url)
+{
+   
+}
+int handle_static(char *msg)//静态资源一般都直接返回
+{
+
+}
+int handle_dynamic()
+{
 }
 int main()
 {
@@ -43,7 +55,7 @@ int main()
 
         bzero(&serve,sizeof(serve));
 	serve.sin_family=AF_INET;
-	serve.sin_addr.s_addr=inet_addr("172.18.212.186");//htonl区别
+	serve.sin_addr.s_addr=inet_addr("172.18.212.186");//htonl区别//172.18.212.186
 	serve.sin_port=htons(80);
 
 	if(bind(socke,(struct sockaddr*)&serve,sizeof(serve))==-1)
@@ -56,6 +68,8 @@ int main()
         signal(SIGCHLD,sig_child);
 	printf("------------wait for client -----------\n");
         int pid;
+        rio_t rio;
+       
 	while(1)
 	{
 		if((fd=accept(socke,(struct sockaddr*)NULL,NULL))==-1)
@@ -65,7 +79,7 @@ int main()
                 if((pid=fork())==0)
                 {
  //               printf("there is someone!!!\n");
-		n=recv(fd,buff,MAXLINE,0);
+		n=recv(fd,buff,MAXLINE,0);//分析请求。//静态请求 直接返回，动态请求 读取 执行 返回执行结果
                close(socke);
 		printf("%s\n",buff);
 		n=strlen(buff);
@@ -80,8 +94,12 @@ int main()
                 }
                 else
                 {
-                   char *success="HELLO WORLD";
-                   sprintf(sendmsg,http_header,200,"OK",11,success);
+                   char success[MAXLINE];
+                   int fd=open("./index.html",O_RDONLY);
+                   while(read(fd,success,1024)>0)
+                   
+                                     
+                   sprintf(sendmsg,http_header,200,"OK",strlen(success),success);
                   //strcat(sendmsg,success);
                    //strcpy(msg,success);
 		}
