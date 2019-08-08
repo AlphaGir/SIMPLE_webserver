@@ -13,9 +13,9 @@ extern char sendmsg[4096];//发送消息
 extern char msg[20];//编码解释
 extern char path[100];//路径
 extern char v1[100];
-extern char value1[100];
+extern char value1[200];
 extern char v2[100];
-extern char value2[100];
+extern char value2[200];
 extern int fd;
 extern char buff[4096];
 extern int is_static;
