@@ -3,8 +3,8 @@
  AW OPERATION
  EW OPERATION
  */
-int codetype;//编码
-char sendmsg[4096];//发送消息
+/*int codetype;//编码
+char sendmsg1[4096];//发送消息
 char msg[20];//编码解释
 char path[100];//路径
 char v1[100];
@@ -15,7 +15,7 @@ int fd;
 char buff[4096];
 int is_static;
 struct stat sbuf;
-
+*/
 void cutout(char *uri,int begin,int end,char *ret)
 {
      int i=0;
@@ -89,6 +89,8 @@ void doit(char* url)//获取返回的响应报文
 }
 void getdynamic()
 {
+    char *str=value1;
+    strcat(str,value2);
     if(stat(path,&sbuf)<0)
     {
                 codetype=err(2,msg);
@@ -99,6 +101,14 @@ void getdynamic()
     {
                 codetype=err(3,msg);
 		return;
+    }
+    char *data;
+    int pid;
+    pid=fork();
+    if(fork==0)
+    {
+          setenv("QUERY_STRING",str,0);
+	  execl(path,path,NULL);
     }
 
 }
@@ -118,8 +128,8 @@ void getstatic()
 		if((fd=open("index.html",O_RDONLY))!=-1)
 		{
 			while(read(fd,buff,1024)>0)
-			strcpy(sendmsg,buff);
-			printf("%s\n",sendmsg);
+			strcpy(sendmsg1,buff);
+			printf("%s\n",sendmsg1);
 			codetype=err(1,msg);
 			return ;
 		}
@@ -137,7 +147,7 @@ void getstatic()
 	if((fd=open(path,O_RDONLY))!=-1)
 	{
 		while(read(fd,buff,1024)>0);
-		strcpy(sendmsg,buff);
+		strcpy(sendmsg1,buff);
 		codetype=err(1,msg);
 		return;
 	}
@@ -154,10 +164,10 @@ int err(int f,char *ret)
    printf("%d",f);
    return f;
 }
-int main()
+/*int main()
 {
    char *url="GET /form_action.cgi?fname=sbsbsbbssbsb&lname=shshdhdhd HTTP/1.1\r\nContent-Type:text/html\r\nContent-Length: 11\r\nServer: mengkang\r\n\r\nhello world";
    int m;
    doit(url);
    printf("%d %s",codetype,msg);
-}
+}*/

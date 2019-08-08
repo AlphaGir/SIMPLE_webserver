@@ -9,8 +9,10 @@
 #include<sys/socket.h>
 #include<sys/wait.h>
 #include<signal.h>
+#include"aw.h"
 #include"IO.h"
 #define MAXLINE 4096
+//extern doit(char *uri);
 /*1.建立连接　
  *2.创建http返回请求
  *3.如果没有该文件就返回４０４，有就显示．
@@ -31,10 +33,10 @@ void sig_child(int signo)
    printf("%d,child is dead",pid);
    return ;
 }
-void doit(char* url)
+/*void doit(char* url)
 {
    
-}
+}*/
 int handle_static(char *msg)//静态资源一般都直接返回
 {
 
@@ -44,10 +46,10 @@ int handle_dynamic()
 }
 int main()
 {
-	int socke,fd;
+	int socke,fd1;
 	struct sockaddr_in serve;
-	char buff[4096];
-	char sendmsg[4096];
+	char buff1[4096];
+	//char sendmsg[4096];
 	int n;
 	long timeval;
 	if((socke =socket(AF_INET,SOCK_STREAM,0))==-1)
@@ -72,41 +74,20 @@ int main()
        
 	while(1)
 	{
-		if((fd=accept(socke,(struct sockaddr*)NULL,NULL))==-1)
+		if((fd1=accept(socke,(struct sockaddr*)NULL,NULL))==-1)
 		{
 			perror("accept:")	;	exit(1);
 		}
                 if((pid=fork())==0)
                 {
  //               printf("there is someone!!!\n");
-		n=recv(fd,buff,MAXLINE,0);//分析请求。//静态请求 直接返回，动态请求 读取 执行 返回执行结果
+		n=recv(fd,buff1,MAXLINE,0);//分析请求。//静态请求 直接返回，动态请求 读取 执行 返回执行结果
+                doit(buff1);
+                char s[1000];
+                
+                sprintf(http_header,codetype,msg,strlen(sendmsg1),sendmsg1);
+                send(fd,http_header,strlen(http_header),0);
                close(socke);
-		printf("%s\n",buff);
-		n=strlen(buff);
-                char msg[30];char *cp;
-                cp=ctime(&timeval);
-		if(buff[0]!='G'&&buff[1]!='E'&&buff[2]!='T')
-                {
-                sprintf(sendmsg,http_header,400,"bad request",n,cp,"not found");
- //               printf("sendmsg:%s\n",sendmsg);
-               // strcpy(msg,"<h1> 404 NOT FOUND </h1>");
-   //             printf("msg:%s\n",msg);
-                }
-                else
-                {
-                   char success[MAXLINE];
-                   int fd=open("./index.html",O_RDONLY);
-                   while(read(fd,success,1024)>0)
-                   
-                                     
-                   sprintf(sendmsg,http_header,200,"OK",strlen(success),success);
-                  //strcat(sendmsg,success);
-                   //strcpy(msg,success);
-		}
-               // send(fd,http1,strlen(http1),0);
-               //msg="<h1> HHHHHHHH</h1>";
-               send(fd,sendmsg,strlen(sendmsg),0);
-                //printf("msg:%s\n",msg);
  //               sleep(100);
                 close(fd);exit(0);
                 }
