@@ -1,25 +1,25 @@
 #ifndef _AW_H_
 #define _AW_H_
 #include<unistd.h>
+#include<sys/wait.h>
 #include<sys/stat.h>
 #include<sys/types.h>
 #include<dirent.h>
-#include<stdio.h>
 #include<fcntl.h>
-#include<string.h>
 #include<stdlib.h>
- int codetype;//编码
- char sendmsg1[4096];//发送消息
- char msg[20];//编码解释
- char path[100];//路径
- char v1[100];
- char value1[200];
- char v2[100];
- char value2[200];
-int fd;
- char buff[4096];
- int is_static;
- struct stat sbuf;
+
+extern int codetype;//编码
+extern char last[1024];
+extern char msg[10];
+extern char path[100];//路径
+extern char v1[100];
+extern char value1[200];
+extern char v2[100];
+extern char value2[200];
+extern int fd;
+extern char buff[4096];
+extern int is_static;
+extern struct stat sbuf;
 
 int err(int code,char *m);
 void doit(char *url);

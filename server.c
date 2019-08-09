@@ -1,6 +1,5 @@
-#include<stdio.h>
 #include<fcntl.h>
-#include<stdlib.h>
+#include<stdio.h>
 #include<time.h>
 #include<unistd.h>
 #include<netdb.h>
@@ -10,9 +9,9 @@
 #include<sys/wait.h>
 #include<signal.h>
 #include"aw.h"
-#include"IO.h"
+extern char **environ;
 #define MAXLINE 4096
-//extern doit(char *uri);
+extern void doit(char *uri);
 /*1.建立连接　
  *2.创建http返回请求
  *3.如果没有该文件就返回４０４，有就显示．
@@ -48,16 +47,15 @@ int main()
 {
 	int socke,fd1;
 	struct sockaddr_in serve;
-	char buff1[4096];
+	char buff1[12580];
 	//char sendmsg[4096];
 	int n;
-	long timeval;
 	if((socke =socket(AF_INET,SOCK_STREAM,0))==-1)
 		perror("socket:");
 
         bzero(&serve,sizeof(serve));
 	serve.sin_family=AF_INET;
-	serve.sin_addr.s_addr=inet_addr("172.18.212.186");//htonl区别//172.18.212.186
+	serve.sin_addr.s_addr=inet_addr("127.0.0.1");//htonl区别//172.18.212.186
 	serve.sin_port=htons(80);
 
 	if(bind(socke,(struct sockaddr*)&serve,sizeof(serve))==-1)
@@ -70,7 +68,6 @@ int main()
         signal(SIGCHLD,sig_child);
 	printf("------------wait for client -----------\n");
         int pid;
-        rio_t rio;
        
 	while(1)
 	{
@@ -81,17 +78,22 @@ int main()
                 if((pid=fork())==0)
                 {
  //               printf("there is someone!!!\n");
-		n=recv(fd,buff1,MAXLINE,0);//分析请求。//静态请求 直接返回，动态请求 读取 执行 返回执行结果
+		n=recv(fd1,buff1,333,0);//分析请求。//静态请求 直接返回，动态请求 读取 执行 返回执行结果
+
+		//printf("url:%s",buff1);
                 doit(buff1);
-                char s[1000];
-                
-                sprintf(http_header,codetype,msg,strlen(sendmsg1),sendmsg1);
-                send(fd,http_header,strlen(http_header),0);
+ 		//printf("code:%d msg:%s len:%d last:%s",codetype,msg,strlen(last),last);               
+                if(sprintf(http_header,codetype,msg,strlen(last),last))
+		perror("sprintf:");
+		printf("response:%s",http_header);
+		perror("sprintf:");
+                send(fd1,http_header,strlen(http_header),0);
+		perror("send:");
                close(socke);
  //               sleep(100);
-                close(fd);exit(0);
+                close(fd1);exit(0);
                 }
-                close(fd);
+                close(fd1);
               //  exit(0);
            //     }
              }

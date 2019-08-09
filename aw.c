@@ -1,21 +1,25 @@
 #include"aw.h"
+
+
+
 /*
  AW OPERATION
  EW OPERATION
  */
-/*int codetype;//编码
-char sendmsg1[4096];//发送消息
-char msg[20];//编码解释
-char path[100];//路径
-char v1[100];
-char value1[100];
-char v2[100];
-char value2[100];
-int fd;
-char buff[4096];
-int is_static;
-struct stat sbuf;
-*/
+extern char **environ;
+ int codetype;//编码
+ char last[4096];//发送消息
+ char msg[20];//编码解释
+ char path[100];//路径
+ char v1[100];
+ char value1[100];
+ char v2[100];
+ char value2[100];
+ int fd;
+ char buff[4096];
+ int is_static;
+ struct stat sbuf;
+
 void cutout(char *uri,int begin,int end,char *ret)
 {
      int i=0;
@@ -105,12 +109,13 @@ void getdynamic()
     char *data;
     int pid;
     pid=fork();
-    if(fork==0)
+    //wait(NULL);//
+    if(pid==0)
     {
-          setenv("QUERY_STRING",str,0);
+          setenv("QUERY_STRING",value1,1);
 	  execl(path,path,NULL);
     }
-
+    
 }
 void getstatic()
 {
@@ -125,11 +130,11 @@ void getstatic()
 	struct stat sbuf;*/
 	if(strcmp(path,"/")==0)
 	{
-		if((fd=open("index.html",O_RDONLY))!=-1)
+		if((fd=open("./index.html",O_RDONLY))!=-1)
 		{
 			while(read(fd,buff,1024)>0)
-			strcpy(sendmsg1,buff);
-			printf("%s\n",sendmsg1);
+			strcpy(last,buff);
+	//		printf("首页::%s\n",last);
 			codetype=err(1,msg);
 			return ;
 		}
@@ -147,7 +152,7 @@ void getstatic()
 	if((fd=open(path,O_RDONLY))!=-1)
 	{
 		while(read(fd,buff,1024)>0);
-		strcpy(sendmsg1,buff);
+		strcpy(last,buff);
 		codetype=err(1,msg);
 		return;
 	}
@@ -161,13 +166,6 @@ int err(int f,char *ret)
      case 3: f=403;strcpy(ret,"fobbiden permission");break;
      case 4: f=501;strcpy(ret,"not implement");break;
    }
-   printf("%d",f);
+   //printf("%d",f);
    return f;
 }
-/*int main()
-{
-   char *url="GET /form_action.cgi?fname=sbsbsbbssbsb&lname=shshdhdhd HTTP/1.1\r\nContent-Type:text/html\r\nContent-Length: 11\r\nServer: mengkang\r\n\r\nhello world";
-   int m;
-   doit(url);
-   printf("%d %s",codetype,msg);
-}*/
