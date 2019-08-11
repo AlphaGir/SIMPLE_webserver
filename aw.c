@@ -15,7 +15,7 @@ extern char **environ;
  char value1[100];
  char v2[100];
  char value2[100];
- int fd;
+ int filed1;
  char buff[4096];
  int is_static;
  struct stat sbuf;
@@ -66,19 +66,21 @@ void doit(char* url)//获取返回的响应报文
    if(strcmp(method,"GET")!=0&&strcmp(method,"POST")!=0)
      {
        codetype=err(4,msg);
-       printf("%s\n",msg);
+       //printf("%s\n",msg);
        return;
      }
    else
      {
             if(!strstr(uri,"cgi"))//静态资源
             {
+	      is_static=1;
               strcpy(path,uri);
-	      printf("path:%s\n",path);
+	      //printf("path:%s\n",path);
               getstatic();
             }
             else
             {
+	     is_static=0;
 	     cutout(uri,'/','?',path);
              strcat(p1,path);
 	     strcpy(path,p1);
@@ -86,13 +88,14 @@ void doit(char* url)//获取返回的响应报文
              cutout(uri,'=','&',value1);
              cutout(uri,'&','=',v2);
              cutout(uri,'=','\0',value2);
-	     printf("path:%s v1:%s value1:%s v2:%s value2:%s",path,v1,value1,v2,value2);//value2傻逼玩意儿
+	 //    printf("path:%s v1:%s value1:%s v2:%s value2:%s",path,v1,value1,v2,value2);//value2傻逼玩意儿
              getdynamic();
             }
      }
 }
 void getdynamic()
 {
+   printf("dynamic page:\n");
     char *str=value1;
     strcat(str,value2);
     if(stat(path,&sbuf)<0)
@@ -106,15 +109,23 @@ void getdynamic()
                 codetype=err(3,msg);
 		return;
     }
-    char *data;
+    /*char *data;
     int pid;
     pid=fork();
-    //wait(NULL);//
+    wait(NULL);//
     if(pid==0)
     {
           setenv("QUERY_STRING",value1,1);
 	  execl(path,path,NULL);
     }
+    perror("read");
+    printf("Sendmsg:%s",last); */
+    
+    codetype=err(1,msg);
+    strcpy(last,value1);
+    strcat(last,"Login success!");
+    
+    return ;
     
 }
 void getstatic()
@@ -128,6 +139,8 @@ void getstatic()
 	char temp[10];
 	int is_static;
 	struct stat sbuf;*/
+	int fd;
+	printf("static page:\n");
 	if(strcmp(path,"/")==0)
 	{
 		if((fd=open("./index.html",O_RDONLY))!=-1)
