@@ -17,9 +17,12 @@ extern char **environ;
  char value2[100];
  int filed1;
  char buff[4096];
+ char buff2[12580];//
  int is_static;
  struct stat sbuf;
-
+void wrong(int fd2);
+void getdynamic(int fd1);
+void getstatic(int fd1);
 void cutout(char *uri,int begin,int end,char *ret)
 {
      int i=0;
@@ -54,19 +57,20 @@ void cutout(char *uri,int begin,int end,char *ret)
 
  }
 
-void doit(char* url)//获取返回的响应报文
+void useit(int fd1,char* url)//获取返回的响应报文
 {
    int i;
    char uri[100];
    char method[5];
    char version[10];
+   char buff2[12580];//
    char p1[300]="./";
    sscanf(url,"%s %s %s",method,uri,version);
-   printf("uri:%s method:%s version:%s\n",uri,method,version);
+ //  printf("uri:%s method:%s version:%s\n",uri,method,version);
    if(strcmp(method,"GET")!=0&&strcmp(method,"POST")!=0)
      {
        codetype=err(4,msg);
-       //printf("%s\n",msg);
+       wrong(fd1);
        return;
      }
    else
@@ -75,8 +79,7 @@ void doit(char* url)//获取返回的响应报文
             {
 	      is_static=1;
               strcpy(path,uri);
-	      //printf("path:%s\n",path);
-              getstatic();
+              getstatic(fd1);
             }
             else
             {
@@ -88,47 +91,77 @@ void doit(char* url)//获取返回的响应报文
              cutout(uri,'=','&',value1);
              cutout(uri,'&','=',v2);
              cutout(uri,'=','\0',value2);
-	 //    printf("path:%s v1:%s value1:%s v2:%s value2:%s",path,v1,value1,v2,value2);//value2傻逼玩意儿
-             getdynamic();
+             getdynamic(fd1);
+	     return ;
             }
      }
 }
-void getdynamic()
+void getdynamic(int fd1)
 {
-   printf("dynamic page:\n");
+   //printf("dynamic page:\n");
     char *str=value1;
     strcat(str,value2);
     if(stat(path,&sbuf)<0)
     {
                 codetype=err(2,msg);
+		wrong(fd1);
                 return;
     }
 
     if(!(S_ISREG(sbuf.st_mode))||!(S_IXUSR&sbuf.st_mode))
     {
                 codetype=err(3,msg);
+		wrong(fd1);
 		return;
     }
-    /*char *data;
+    char *data;
     int pid;
-    pid=fork();
-    wait(NULL);//
+    int trans[2];
+    if((pipe(trans))<0)
+	{
+		perror("pipe:");
+	}
+    if((pid=fork())<0)
+	{
+		perror("fork:");
+	}
+
     if(pid==0)
     {
+	  dup2(trans[0],0);
+	  dup2(trans[1],1);
+	  close(trans[0]);
           setenv("QUERY_STRING",value1,1);
-	  execl(path,path,NULL);
+	  execl(path,NULL);//检测管道是不是能通信
+	  //exit(0);
     }
-    perror("read");
-    printf("Sendmsg:%s",last); */
-    
-    codetype=err(1,msg);
-    strcpy(last,value1);
-    strcat(last,"Login success!");
-    
-    return ;
+    else
+    {
+    close(trans[1]);
+    char c;
+    //codetype=err(1,msg);
+    //sprintf(buff2,"HTTP/1.1 %d %s\r\n",codetype,msg);
+	    while(read(trans[0],last,1024));
+            printf("Last:%s\n",last);
+	    codetype=err(1,msg);
+            sprintf(buff2,"HTTP/1.1 %d %s\r\n",codetype,msg);
+            sprintf(buff2, "%sContent-Length: %d\r\n",buff2,strlen(last));
+            sprintf(buff2, "%sContent-Type:text/html\r\n",buff2);
+            sprintf(buff2,"%sConnection：Keep-alive\r\n\r\n",buff2);
+            sprintf(buff2,"%s%s",buff2,last);
+            send(fd1,buff2,strlen(buff2),0);
+            wait(0);	
+    }
     
 }
-void getstatic()
+void wrong(int fd2)
+{
+                 sprintf(buff2,"HTTP/1.1 %d %s\r\n",codetype,msg);
+                 sprintf(buff2, "%sContent-Length: %d\r\n",buff2,0);
+                 sprintf(buff2, "%sContent-Type:text/html\r\n\r\n",buff2);
+                 send(fd2,buff2,strlen(buff2),0);
+}
+void getstatic(int fd1)
 {
          //建议资源有没有 没有404 然后可不可以访问
          //不可以就 403
@@ -140,33 +173,47 @@ void getstatic()
 	int is_static;
 	struct stat sbuf;*/
 	int fd;
-	printf("static page:\n");
+//	printf("static page:\n");
 	if(strcmp(path,"/")==0)
 	{
 		if((fd=open("./index.html",O_RDONLY))!=-1)
 		{
 			while(read(fd,buff,1024)>0)
 			strcpy(last,buff);
+			close(fd);
 	//		printf("首页::%s\n",last);
 			codetype=err(1,msg);
+                        sprintf(buff2,"HTTP/1.1 %d %s\r\n",codetype,msg);
+			sprintf(buff2, "%sContent-Length: %d\r\n",buff2,strlen(last));
+                        sprintf(buff2, "%sContent-Type:text/html\r\n\r\n",buff2);
+                        sprintf(buff2,"%s%s",buff2,last);
+			send(fd1,buff2,strlen(buff2),0);
 			return ;
 		}
 	}
 	if(stat(path,&sbuf)<0)
 	{
 		codetype=err(2,msg);
+		wrong(fd1);
 		return;
 	}
 	if(!(S_ISREG(sbuf.st_mode))||!(S_IRUSR&sbuf.st_mode))
 	{
 		codetype=err(3,msg);
+		wrong(fd1);
 		return ;
 	}
 	if((fd=open(path,O_RDONLY))!=-1)
 	{
 		while(read(fd,buff,1024)>0);
 		strcpy(last,buff);
+		close(fd);
 		codetype=err(1,msg);
+                sprintf(buff2,"HTTP/1.1 %d %s\r\n",codetype,msg);
+                sprintf(buff2, "%sContent-Length: %d\r\n",buff2,strlen(last));
+                sprintf(buff2, "%sContent-Type:text/html\r\n\r\n",buff2);
+                sprintf(buff2,"%s%s",buff2,last);
+		send(fd1,buff2,strlen(buff2),0);
 		return;
 	}
 }
@@ -179,6 +226,6 @@ int err(int f,char *ret)
      case 3: f=403;strcpy(ret,"fobbiden permission");break;
      case 4: f=501;strcpy(ret,"not implement");break;
    }
-   //printf("%d",f);
    return f;
 }
+

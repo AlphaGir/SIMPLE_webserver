@@ -1,7 +1,8 @@
-server:	server.c aw.c 
-	gcc -o server.o server.c -o aw.o aw.c 
+server:	server.c
+	gcc -o server server.c aw.c 
 form_action.cgi:	form_action.c    
-	gcc -o form_action.cgi form_action.cgi
+	gcc -o form_action.cgi form_action.c
 clean:
-	rm -f *.o
+	rm -f server
+	rm -f form_action.cgi
 

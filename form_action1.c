@@ -5,19 +5,19 @@
 #define oops(msg) {perror(msg); exit(1);}
 int main(int arg,char *agv[])
 {
-	char sss[1000];
+/*	char sss[1000];
         char *p2 = (char *)getenv("QUERY_STRING");
 	if(p2)
 	{
 	char *arg1="<html>\n"
         "<head>\n<meta charset=\"utf-8\">\n<title>Congratualation</title></head>\n"
         "<body bgcolor=\"#666666\">"
-	"%s"
+	 "%s"
 	"已经成功注册</body>\n"
         "</html>\n";
 	
-	  sprintf(sss,arg1,p2);
+	sprintf(sss,arg1,p2);
+*/	
+	printf("%s","ew ew ew");
 	
-          printf("%s",sss);
-	}
 }

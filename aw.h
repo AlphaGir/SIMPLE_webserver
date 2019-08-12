@@ -18,12 +18,12 @@ extern char v2[100];
 extern char value2[200];
 extern int fd;
 extern char buff[4096];
+extern char buff2[12580];//
 extern int is_static;
 extern struct stat sbuf;
-
-int err(int code,char *m);
-void doit(char *url);
-void getstatic();
-void getdynamic();
-void cutout(char *uri,int begin,int end,char *ret);
+extern int err(int code,char *m);
+extern void useit(int fd1,char *url);
+extern void getstatic(int fd1);
+extern void getdynamic(int fd1);
+extern void cutout(char *uri,int begin,int end,char *ret);
 #endif
