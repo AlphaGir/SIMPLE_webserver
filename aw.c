@@ -1,20 +1,17 @@
 #include"aw.h"
-
-
-
 /*
  AW OPERATION
  EW OPERATION
  */
 extern char **environ;
  int codetype;//编码
- char last[4096];//发送消息
- char msg[20];//编码解释
+ char last[1024];//发送消息
+ char msg[10];//编码解释
  char path[100];//路径
  char v1[100];
- char value1[100];
+ char value1[200];
  char v2[100];
- char value2[100];
+ char value2[200];
  int filed1;
  char buff[4096];
  char buff2[12580];//
@@ -46,7 +43,7 @@ void cutout(char *uri,int begin,int end,char *ret)
 	     int len=strlen(uri)-s;
 	     char ss[len];
 	     memcpy(ret,uri+s+1,len-1);
-	     ret[len]='\0';//EW   傻逼代码 
+	     ret[len]='\0';//
      }
      else
      {
@@ -66,7 +63,7 @@ void useit(int fd1,char* url)//获取返回的响应报文
    char buff2[12580];//
    char p1[300]="./";
    sscanf(url,"%s %s %s",method,uri,version);
- //  printf("uri:%s method:%s version:%s\n",uri,method,version);
+   printf("uri:%s method:%s version:%s\n",uri,method,version);
    if(strcmp(method,"GET")!=0&&strcmp(method,"POST")!=0)
      {
        codetype=err(4,msg);
@@ -98,7 +95,6 @@ void useit(int fd1,char* url)//获取返回的响应报文
 }
 void getdynamic(int fd1)
 {
-   //printf("dynamic page:\n");
     char *str=value1;
     strcat(str,value2);
     if(stat(path,&sbuf)<0)
@@ -146,7 +142,7 @@ void getdynamic(int fd1)
 	    codetype=err(1,msg);
             sprintf(buff2,"HTTP/1.1 %d %s\r\n",codetype,msg);
             sprintf(buff2, "%sContent-Length: %d\r\n",buff2,strlen(last));
-            sprintf(buff2, "%sContent-Type:text/html\r\n",buff2);
+            sprintf(buff2, "%sContent-Type:text/html,charset:utf-8;\r\n",buff2);
             sprintf(buff2,"%sConnection：Keep-alive\r\n\r\n",buff2);
             sprintf(buff2,"%s%s",buff2,last);
             send(fd1,buff2,strlen(buff2),0);
@@ -185,7 +181,7 @@ void getstatic(int fd1)
 			codetype=err(1,msg);
                         sprintf(buff2,"HTTP/1.1 %d %s\r\n",codetype,msg);
 			sprintf(buff2, "%sContent-Length: %d\r\n",buff2,strlen(last));
-                        sprintf(buff2, "%sContent-Type:text/html\r\n\r\n",buff2);
+                        sprintf(buff2, "%sContent-Type:text/html,charset:utf-8;\r\n\r\n",buff2);
                         sprintf(buff2,"%s%s",buff2,last);
 			send(fd1,buff2,strlen(buff2),0);
 			return ;
@@ -211,7 +207,7 @@ void getstatic(int fd1)
 		codetype=err(1,msg);
                 sprintf(buff2,"HTTP/1.1 %d %s\r\n",codetype,msg);
                 sprintf(buff2, "%sContent-Length: %d\r\n",buff2,strlen(last));
-                sprintf(buff2, "%sContent-Type:text/html\r\n\r\n",buff2);
+                sprintf(buff2, "%sContent-Type:text/html,charset:utf-8\r\n\r\n",buff2);
                 sprintf(buff2,"%s%s",buff2,last);
 		send(fd1,buff2,strlen(buff2),0);
 		return;

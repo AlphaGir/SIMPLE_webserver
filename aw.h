@@ -16,7 +16,6 @@ extern char v1[100];
 extern char value1[200];
 extern char v2[100];
 extern char value2[200];
-extern int fd;
 extern char buff[4096];
 extern char buff2[12580];//
 extern int is_static;

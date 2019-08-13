@@ -1,4 +1,4 @@
-server:	server.c form_action.cgi
+server:	server.c form_action.cgi aw.c aw.h
 	gcc -o server server.c aw.c form_action.cgi 
 form_action.cgi:	form_action.c    
 	gcc -o form_action.cgi form_action.c
