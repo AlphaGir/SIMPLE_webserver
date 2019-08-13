@@ -9,15 +9,8 @@
 #include<sys/wait.h>
 #include<signal.h>
 #include"aw.h"
-//extern char **environ;
 #define MAXLINE 4096
-//extern void useit(int f,char *uri);
 extern int fd1;
-/*1.建立连接　
- *2.创建http返回请求
- *3.如果没有该文件就返回４０４，有就显示．
- */
-
 void sig_child(int signo)//消灭僵尸进程 僵尸进程会占用资源如果一直不释放的话
 {
    int pid;
@@ -31,7 +24,7 @@ int main(int arg,char *argv[])
 	struct sockaddr_in serve;
 	struct sockaddr_in client_name;
         socklen_t  client_name_len = sizeof(client_name);
-	char buff1[12580];
+	char buff1[1024];
 	int n,ret;
 	int on=1;
         ret = setsockopt( socke, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on) );

@@ -13,8 +13,8 @@ extern char **environ;
  char v2[100];
  char value2[200];
  int filed1;
- char buff[4096];
- char buff2[12580];//
+ char buff[1024];
+ char buff2[1024];//
  int is_static;
  struct stat sbuf;
 void wrong(int fd2);
@@ -60,7 +60,7 @@ void useit(int fd1,char* url)//获取返回的响应报文
    char uri[100];
    char method[5];
    char version[10];
-   char buff2[12580];//
+   char buff2[12580];
    char p1[300]="./";
    sscanf(url,"%s %s %s",method,uri,version);
    printf("uri:%s method:%s version:%s\n",uri,method,version);
@@ -128,15 +128,12 @@ void getdynamic(int fd1)
 	  dup2(trans[1],1);
 	  close(trans[0]);
           setenv("QUERY_STRING",value1,1);
-	  execl(path,NULL);//检测管道是不是能通信
-	  //exit(0);
+	  execl(path,NULL);
     }
     else
     {
     close(trans[1]);
     char c;
-    //codetype=err(1,msg);
-    //sprintf(buff2,"HTTP/1.1 %d %s\r\n",codetype,msg);
 	    while(read(trans[0],last,1024));
             printf("Last:%s\n",last);
 	    codetype=err(1,msg);
@@ -159,17 +156,7 @@ void wrong(int fd2)
 }
 void getstatic(int fd1)
 {
-         //建议资源有没有 没有404 然后可不可以访问
-         //不可以就 403
-         //有&&可以访问 读取资源返回字符串
-     /*   int fd;   
-	char buff[4096];
-	char ss[1024];
-	char temp[10];
-	int is_static;
-	struct stat sbuf;*/
 	int fd;
-//	printf("static page:\n");
 	if(strcmp(path,"/")==0)
 	{
 		if((fd=open("./index.html",O_RDONLY))!=-1)
@@ -177,7 +164,6 @@ void getstatic(int fd1)
 			while(read(fd,buff,1024)>0)
 			strcpy(last,buff);
 			close(fd);
-	//		printf("首页::%s\n",last);
 			codetype=err(1,msg);
                         sprintf(buff2,"HTTP/1.1 %d %s\r\n",codetype,msg);
 			sprintf(buff2, "%sContent-Length: %d\r\n",buff2,strlen(last));

@@ -16,8 +16,8 @@ extern char v1[100];
 extern char value1[200];
 extern char v2[100];
 extern char value2[200];
-extern char buff[4096];
-extern char buff2[12580];//
+extern char buff[1024];
+extern char buff2[1024];//
 extern int is_static;
 extern struct stat sbuf;
 extern int err(int code,char *m);

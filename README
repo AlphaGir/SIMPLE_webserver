@@ -6,4 +6,5 @@
 
 编译:make
 清理重新编译:make clean
+运行需要超级用户权限: sudo ./server 
 
